@@ -199,21 +199,7 @@
             </div>
 
             <!-- QRIS -->
-            <h2><i class="fas fa-gift"></i> Santunan & Doa Restu</h2>
-            <div class="qris-section">
-                <h3 style="color: #25D366; margin-bottom: 20px;">
-                    <i class="fas fa-qrcode"></i> Scan untuk Santunan
-                </h3>
-                <div class="qris-container">
-                    <canvas id="qrisCanvas"></canvas>
-                </div>
-                <div class="qris-options">
-                    <button class="qris-btn" onclick="generateQRIS(50000)">Rp50K</button>
-                    <button class="qris-btn" onclick="generateQRIS(100000)">Rp100K</button>
-                    <button class="qris-btn" onclick="generateQRIS(250000)">Rp250K</button>
-                    <button class="qris-btn" onclick="generateQRISCustom()">Custom</button>
-                </div>
-            </div>
+          
         </div>
 
         <!-- FOOTER DENGAN PENGHARAPAN -->
@@ -226,7 +212,7 @@
             <p style="font-size: 1.1em; margin-bottom: 20px;">
                 Konfirmasi kehadiran: 0858-0885-0565
             </p>
-            <a href="https://wa.me/6285808850565?text=Assalamualaikum.%20Saya%20konfirmasi%20hadir%20ke%20akad%20nikah%20Budi%20%26%20Sari%20insyaAllah%20dapat%20barokah." class="whatsapp-btn">
+            <a href="https://wa.me/6285808850565?text=Assalamualaikum.%20Saya%20konfirmasi%20hadir%20ke%20akad%20nikah%20Amien%20%26%20Milla%20insyaAllah%20dapat%20barokah." class="whatsapp-btn">
                 <i class="fab fa-whatsapp"></i> Konfirmasi & Doa
             </a>
             <p style="margin-top: 25px; opacity: 0.9; font-size: 0.95em;">
@@ -237,36 +223,54 @@
 
     <!-- JAVASCRIPT QRIS (SAMA) -->
     <script>
-        const qrisData = { merchantName: "Budi Santoso", phone: "081234567890", city: "Jakarta" };
+    // ✅ QRIS BCA SATRIO - REAL MONEY!
+    const qrisData = { 
+        merchantName: "Satrio Bagus Septianto Wijaya",  // 25 char max
+        phone: "085735652166",                          // BCA QRIS Anda
+        city: "Sidoarjo"                                // Kota
+    };
+    
+    window.onload = () => generateQRIS(100000);  // Default Rp100K
+    
+    function generateQRIS(nominal) {
+        // QRIS STANDARD INDONESIA (BCA Compatible)
+        const amount = String(nominal).padStart(12, '0');
+        const qrisPayload = `000201010212${qrisData.merchantName.padEnd(25)}${qrisData.phone.padEnd(15)}5802ID${qrisData.city.padEnd(15)}5303${amount}54038D025802ID${qrisData.phone.padEnd(15)}52040000`;
         
-        window.onload = () => generateQRIS(100000);
+        const canvas = document.getElementById('qrisCanvas');
+        QRCode.toCanvas(canvas, qrisPayload, { 
+            width: 280, 
+            margin: 1,
+            color: { dark: "#000000", light: "#FFFFFF" }
+        });
         
-        function generateQRIS(nominal) {
-            const qrisPayload = `000201010212${qrisData.merchantName.padEnd(25)}${qrisData.phone.padEnd(15)}5802ID${qrisData.city.padEnd(15)}5303${String(nominal).padStart(12,'0')}5403A99999103A000000000${String(nominal).padStart(12,'0')}815810${qrisData.phone.padEnd(15)}52040000`;
-            const canvas = document.getElementById('qrisCanvas');
-            QRCode.toCanvas(canvas, qrisPayload, { width: 250, margin: 1 });
-        }
-        
-        function generateQRISCustom() {
-            const nominal = prompt('Nominal santunan (contoh: 75000):') || '100000';
-            generateQRIS(parseInt(nominal));
-        }
-        
-        document.getElementById('qrisCanvas').onclick = () => {
-            const nominal = prompt('Nominal (kosong = Rp100K):') || '100000';
-            window.open(`qris://?payload=000201010212Budi Santoso               081234567890       5802IDJAKARTA               5303${String(nominal).padStart(12,'0')}5403A99999103A000000000${String(nominal).padStart(12,'0')}815810081234567890       52040000`, '_blank');
-        };
-        
-        // Hearts
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.innerHTML = '💕';
-            heart.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:100vh;font-size:20px;pointer-events:none;z-index:1000;animation:floatUp 4s linear forwards;`;
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 4000);
-        }
-        document.head.appendChild(Object.assign(document.createElement('style'), {textContent: '@keyframes floatUp { to { transform: translateY(-100vh) rotate(360deg); opacity: 0; } }'}));
-        setInterval(createHeart, 2500);
-    </script>
+        // Update label nominal
+        document.querySelector('.qris-section h3').innerHTML = 
+            `<i class="fas fa-qrcode"></i> Rp${(nominal/1000).toLocaleString()}K - Satrio BCA`;
+    }
+    
+    function generateQRISCustom() {
+        const nominal = parseInt(prompt('Nominal santunan:\n(contoh: 75000):') || '100000');
+        if (nominal > 0) generateQRIS(nominal);
+    }
+    
+    // ✅ Deep link QRIS semua bank
+    document.getElementById('qrisCanvas').onclick = () => {
+        const nominal = prompt('Nominal santunan:\n(Kosongkan = Rp100K):') || '100000';
+        const url = `qris://?amount=${nominal}&label=Satrio%20Wedding&hint=${qrisData.phone}`;
+        window.open(url, '_blank');
+    };
+    
+    // Hearts animation (tetap)
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.innerHTML = '💕';
+        heart.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:100vh;font-size:20px;pointer-events:none;z-index:1000;animation:floatUp 4s linear forwards;`;
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 4000);
+    }
+    document.head.appendChild(Object.assign(document.createElement('style'), {textContent: '@keyframes floatUp { to { transform: translateY(-100vh) rotate(360deg); opacity: 0; } }'}));
+    setInterval(createHeart, 2500);
+</script>
 </body>
 </html>
